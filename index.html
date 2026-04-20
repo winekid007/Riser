@@ -34,7 +34,7 @@
         @media (min-width: 1024px) { .mobile-hero-text { font-size: 7.5rem; } }
         
         button, .photo-card { touch-action: manipulation; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .flex { display: flex; }
     </style>
 </head>
@@ -63,7 +63,7 @@
             
             <div class="flex items-center gap-x-3">
                 <a href="#contact" class="px-5 py-2 rounded-full border border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black text-sm font-semibold transition-all active:scale-95">BOOK</a>
-                <button id="mobile-menu-btn" class="md:hidden w-11 h-11 flex items-center justify-center text-xl"><i class="fa-solid fa-bars"></i></button>
+                <button id="mobile-menu-btn" aria-label="Open mobile menu" class="md:hidden w-11 h-11 flex items-center justify-center text-xl"><i class="fa-solid fa-bars"></i></button>
             </div>
         </div>
     </nav>
@@ -194,10 +194,10 @@
         
         <form id="contact-form" onsubmit="submitBookingForm(event)" class="text-left">
             <div class="space-y-4">
-                <input type="text" placeholder="Your Name" required class="w-full bg-white/5 border border-white/20 focus:border-yellow-400 placeholder:text-white/50 px-6 py-4 rounded-2xl text-lg">
-                <input type="text" placeholder="Production / Company" required class="w-full bg-white/5 border border-white/20 focus:border-yellow-400 placeholder:text-white/50 px-6 py-4 rounded-2xl text-lg">
-                <input type="email" placeholder="Email Address" required class="w-full bg-white/5 border border-white/20 focus:border-yellow-400 placeholder:text-white/50 px-6 py-4 rounded-2xl text-lg">
-                <textarea placeholder="Tell us about the role..." rows="4" required class="w-full bg-white/5 border border-white/20 focus:border-yellow-400 placeholder:text-white/50 px-6 py-4 rounded-3xl text-lg resize-y"></textarea>
+                <input type="text" aria-label="Your Name" placeholder="Your Name" required class="w-full bg-white/5 border border-white/20 focus:border-yellow-400 placeholder:text-white/50 px-6 py-4 rounded-2xl text-lg">
+                <input type="text" aria-label="Production or Company" placeholder="Production / Company" required class="w-full bg-white/5 border border-white/20 focus:border-yellow-400 placeholder:text-white/50 px-6 py-4 rounded-2xl text-lg">
+                <input type="email" aria-label="Email Address" placeholder="Email Address" required class="w-full bg-white/5 border border-white/20 focus:border-yellow-400 placeholder:text-white/50 px-6 py-4 rounded-2xl text-lg">
+                <textarea aria-label="Tell us about the role" placeholder="Tell us about the role..." rows="4" required class="w-full bg-white/5 border border-white/20 focus:border-yellow-400 placeholder:text-white/50 px-6 py-4 rounded-3xl text-lg resize-y"></textarea>
             </div>
             <button type="submit" class="mt-6 w-full py-4 rounded-2xl bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-extrabold text-lg active:scale-[0.985]">SEND AUDITION REQUEST</button>
         </form>
@@ -208,7 +208,7 @@
     </footer>
 
     <!-- MODAL -->
-    <div id="photo-modal" onclick="if (event.target.id === 'photo-modal') closeModal()" class="hidden fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4">
+    <div id="photo-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-caption" onclick="if (event.target.id === 'photo-modal') closeModal()" class="hidden fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4">
         <div onclick="event.stopImmediatePropagation()" class="modal relative w-full max-w-[1000px]">
             <button onclick="closeModal()" class="absolute -top-3 -right-3 z-10 w-12 h-12 flex items-center justify-center bg-zinc-900 hover:bg-red-600 transition rounded-full text-white border border-white/30 text-2xl">×</button>
             
@@ -378,6 +378,7 @@
                 const menu = document.createElement('div');
                 menu.className = `fixed inset-0 bg-black/95 z-[90] flex flex-col pt-20 px-6`;
                 menu.innerHTML = `
+                    <button aria-label="Close mobile menu" class="self-end text-white text-4xl mb-6">×</button>
                     <div class="flex flex-col text-3xl font-light gap-y-4">
                         <a href="#about" class="py-4 border-b border-white/10">About Riser</a>
                         <a href="#gallery" class="py-4 border-b border-white/10">Gallery</a>
@@ -387,7 +388,16 @@
                     </div>
                 `;
                 document.body.appendChild(menu);
-                menu.onclick = (e) => { if (e.target === menu) menu.remove(); };
+                const onKeyDown = (e) => {
+                    if (e.key === 'Escape') closeMenu();
+                };
+                const closeMenu = () => {
+                    menu.remove();
+                    document.removeEventListener('keydown', onKeyDown);
+                };
+                menu.querySelector('button').onclick = closeMenu;
+                menu.onclick = (e) => { if (e.target === menu) closeMenu(); };
+                document.addEventListener('keydown', onKeyDown);
             };
         }
 
@@ -409,7 +419,6 @@
                 obs.observe(stats);
             }
             
-            console.log('%c[RISER COTTON] ✨ Mobile-optimized site loaded with all 9 photos!', 'color:#FFD700');
         }
 
         window.onload = initializeWebsite;
