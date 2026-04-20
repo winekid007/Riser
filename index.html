@@ -9,7 +9,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap');
         
-        body { font-family: 'Inter', system_ui, sans-serif; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
         .heading-serif { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; letter-spacing: -0.025em; }
         
         .cinematic-bg { background: radial-gradient(circle at center, #1a1a2e 0%, #000000 80%); position: relative; overflow: hidden; }
@@ -296,7 +296,9 @@
             currentPhotoIndex = index;
             const photo = galleryPhotos[index];
             const modal = document.getElementById('photo-modal');
-            document.getElementById('modal-image').src = photo.src;
+            const modalImage = document.getElementById('modal-image');
+            modalImage.src = photo.src;
+            modalImage.alt = photo.title;
             document.getElementById('modal-title').textContent = photo.title;
             document.getElementById('modal-category').textContent = photo.category;
             document.getElementById('modal-caption').textContent = photo.caption;
@@ -367,14 +369,16 @@
                     c.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:-20px;width:8px;height:8px;background:${colors[Math.floor(Math.random()*3)]};z-index:99999;pointer-events:none;border-radius:50%`;
                     document.body.appendChild(c);
                     c.animate([{transform:'translateY(0)'}, {transform:`translateY(${window.innerHeight+100}px)`}], {duration: Math.random()*3000+2200, easing:'ease-out'}).onfinish = () => c.remove();
-                }, i * 0.5);
+                }, i * 12);
             }
         }
 
         function initMobileMenu() {
             const btn = document.getElementById('mobile-menu-btn');
             if (!btn) return;
+            btn.setAttribute('aria-expanded', 'false');
             btn.onclick = () => {
+                btn.setAttribute('aria-expanded', 'true');
                 const menu = document.createElement('div');
                 menu.className = `fixed inset-0 bg-black/95 z-[90] flex flex-col pt-20 px-6`;
                 menu.innerHTML = `
@@ -393,6 +397,7 @@
                 };
                 const closeMenu = () => {
                     menu.remove();
+                    btn.setAttribute('aria-expanded', 'false');
                     document.removeEventListener('keydown', onKeyDown);
                 };
                 menu.querySelector('button').onclick = closeMenu;
